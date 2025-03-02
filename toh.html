@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOWER OF HONOI </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+            font-family: 'Ruluko', sans-serif;
+            color: white;
+            text-align: center;
+            background-color:#3e3d3c;
+        }
+        header, h2 {
+            color: white;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 30px;
+        }
+        .tracker {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background-color: #53524f;
+            padding: 10px;
+            width: 80%;
+            margin: 10px auto;
+            border: groove white 5px;
+            border-radius: 20px;
+        }
+        .board {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 300px;
+            width: 90%;
+            margin: auto;
+            background-color: rgba(206, 206, 206, .8);
+            border: groove white 2px;
+            padding-top: 20px;
+            position: relative;
+            border-radius: 10px;
+        }
+        .tower {
+            width: 30%;
+            height: 350px;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            position: relative;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        /* Improved Pole Design */
+        .pole {
+            position: absolute;
+            bottom: 15px;
+            height: 270px;
+            width: 12px;
+            background: linear-gradient(180deg, #8B4513, #5C3317);
+            border-radius: 6px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+        /* Improved Base of Tower */
+        .base {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(180deg, #8B4513, #5C3317);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .disk {
+            background-color: rgb(54, 50, 50);
+            border: solid white 2px;
+            border-radius: 50px;
+            height: 40px;
+            margin-bottom: 5px;
+            box-shadow: 2px 2px 8px rgba(255, 255, 255, 0.2);
+        }
+        .selected {
+            border: 5px solid white;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+        }
+        .reset {
+            background-color: #0B3303;
+            border: groove white 2px;
+            border-radius: 20px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #modal {
+            background-color: rgba(0, 0, 0, .4);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #modal-textbox {
+            background-color: #f8f9f7;
+            padding: 20px;
+            border: groove white 5px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+        }
+        H2{
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TOWER OF HONOI </h1>
+    </header>
+
+    <div class="tracker">
+        <p>Choose Disks <br>
+            <select id="drop" onchange="newGame()">
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+        </p>
+        <div><p>Moves</p> <div id="counter">0</div></div>
+        <div><p>Minimum moves</p> <div id="minimum">0</div></div>
+    </div>
+
+    <h2>Game</h2>
+    <div id="modal">
+        <div id="modal-textbox">
+            <h2>Congratulations!</h2>
+            <p id="winner"></p>
+        </div>
+    </div>
+
+    <div class="board">
+        <div class="tower" id="first">
+            <div class="pole"></div>
+            <div class="base"></div>
+        </div>
+        <div class="tower" id="second">
+            <div class="pole"></div>
+            <div class="base"></div>
+        </div>
+        <div class="tower" id="third">
+            <div class="pole"></div>
+            <div class="base"></div>
+        </div>
+    </div>
+
+    <button class="reset" onclick="newGame()">Reset</button>
+
+    <script>
+        const tower1 = document.querySelector('#first');
+        const tower2 = document.querySelector('#second');
+        const tower3 = document.querySelector('#third');
+        let active = false, counter = 0, minMoves = 0, diskSelector = 3;
+
+        function build() {
+            tower1.innerHTML = "<div class='pole'></div><div class='base'></div>";
+            tower2.innerHTML = "<div class='pole'></div><div class='base'></div>";
+            tower3.innerHTML = "<div class='pole'></div><div class='base'></div>";
+
+            diskSelector = parseInt(document.getElementById('drop').value);
+            for (let i = diskSelector; i > 0; i--) {
+                let disk = document.createElement('div');
+                disk.className = 'disk';
+                disk.style.width = (i * 30 + 50) + "px";
+                tower1.appendChild(disk);
+            }
+            minMoves = 2 ** diskSelector - 1;
+            document.getElementById('minimum').textContent = minMoves;
+        }
+
+        function moveDisk(event) {
+            let tower = event.currentTarget;
+            if (!active && tower.lastElementChild && !tower.lastElementChild.classList.contains("base")) {
+                active = tower.lastElementChild;
+                active.classList.add("selected");
+            } else if (active && (tower.childElementCount === 2 || active.offsetWidth < tower.lastElementChild.offsetWidth)) {
+                active.classList.remove("selected");
+                tower.appendChild(active);
+                counter++;
+                document.getElementById('counter').textContent = counter;
+                checkWinner();
+                active = false;
+            } else if (active) {
+                active.classList.remove("selected");
+                active = false;
+            }
+        }
+
+        function checkWinner() {
+            if (tower3.childElementCount === diskSelector + 2) {
+                document.getElementById('modal').style.display = "flex";
+                document.getElementById('winner').textContent =
+                    `You cleared the tower in ${counter} moves!` +
+                    (counter === minMoves ? " Perfect score!" : ` Try again in ${minMoves} moves.`);
+            }
+        }
+
+        function newGame() {
+            document.getElementById('modal').style.display = "none";
+            counter = 0;
+            active = false;
+            document.getElementById('counter').textContent = counter;
+            build();
+        }
+
+        [tower1, tower2, tower3].forEach(tower => tower.addEventListener("click", moveDisk));
+
+        build();
+    </script>
+</body>
+</html>
