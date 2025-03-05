@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOWER OF HONOI </title>
+    <title>TOWER OF HANOI</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             font-family: 'Ruluko', sans-serif;
             color: white;
             text-align: center;
-            background-color:#3e3d3c;
+            background-color: #3e3d3c;
         }
         header, h2 {
             color: white;
@@ -58,7 +58,6 @@
             margin: 0 10px;
             cursor: pointer;
         }
-        /* Improved Pole Design */
         .pole {
             position: absolute;
             bottom: 15px;
@@ -68,7 +67,6 @@
             border-radius: 6px;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
         }
-        /* Improved Base of Tower */
         .base {
             position: absolute;
             bottom: 0;
@@ -99,33 +97,11 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        #modal {
-            background-color: rgba(0, 0, 0, .4);
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        #modal-textbox {
-            background-color: #f8f9f7;
-            padding: 20px;
-            border: groove white 5px;
-            border-radius: 20px;
-            text-align: center;
-            color: white;
-        }
-        H2{
-            color: black;
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1>TOWER OF HONOI </h1>
+        <h1>TOWER OF HANOI</h1>
     </header>
 
     <div class="tracker">
@@ -142,12 +118,6 @@
     </div>
 
     <h2>Game</h2>
-    <div id="modal">
-        <div id="modal-textbox">
-            <h2>Congratulations!</h2>
-            <p id="winner"></p>
-        </div>
-    </div>
 
     <div class="board">
         <div class="tower" id="first">
@@ -208,15 +178,11 @@
 
         function checkWinner() {
             if (tower3.childElementCount === diskSelector + 2) {
-                document.getElementById('modal').style.display = "flex";
-                document.getElementById('winner').textContent =
-                    `You cleared the tower in ${counter} moves!` +
-                    (counter === minMoves ? " Perfect score!" : ` Try again in ${minMoves} moves.`);
+                alert(`Congratulations! You completed the Tower of Hanoi in ${counter} moves!`);
             }
         }
 
         function newGame() {
-            document.getElementById('modal').style.display = "none";
             counter = 0;
             active = false;
             document.getElementById('counter').textContent = counter;
